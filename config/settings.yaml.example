@@ -1,0 +1,15 @@
+SETTINGS:
+  - LOGGING:
+    - LEVEL: INFO
+  - API:
+    - URL: http://190.90.5.133:8080/api/historicdata.json
+    - PARAMS_DEFAULT:
+      - usecaption: 1
+      - username: reportsBackend
+      - passhash: 1246000603
+  - DATABASE:
+    - USER: 
+    - PASSWORD:
+    - DB_NAME:
+    - HOST: 
+

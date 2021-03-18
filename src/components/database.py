@@ -5,7 +5,7 @@
 """ Database class """
 
 from mysql.connector import connect
-from commans.utils import CommonsUtils
+from components.utils import CommonsUtils
 
 # Init config Log
 logging = CommonsUtils.setup_logging()

@@ -13,8 +13,9 @@ from components.utils import CommonsUtils
 logging = CommonsUtils.setup_logging()
 
 class Ticket:
-    def __init__(self, ticket):
+    def __init__(self, ticket, all_staff):
         self.reset()
+        self.__all_staff = all_staff
         self.__ticket = self.convert_tuple_dict(ticket, self.TICKET_HEADERS)
         try:
             self.time_life_ticket = self.__ticket['closed'] - self.__ticket['created']
@@ -42,6 +43,12 @@ class Ticket:
         'pdept')
 
     INFO_TICKET_HEADERS = ('field_id', 'value')
+
+    LIST_DEPT = [
+        'Operaciones',
+        'Pre-Venta',
+        'Comercial'
+    ]
 
     def get_ticket(self):
         return self.__ticket
@@ -113,7 +120,7 @@ class Ticket:
         return 0
     
     def get_info_ticket(self):
-        return [
+        row_info = [
             self.__ticket['number'],
             self.__ticket['dept'],
             self.__ticket['fact_type'],
@@ -122,11 +129,27 @@ class Ticket:
             self.__ticket['est_duedate'],
             self.__ticket['closed'],
             self.conver_date_to_minutes(self.sla),
-            self.conver_date_to_minutes(self.time_life_ticket),
-            self.conver_date_to_minutes(self.TIMES_BY_DEPT['Operaciones']),
-            self.conver_date_to_minutes(self.TIMES_BY_DEPT['Pre-Venta']),
-            self.conver_date_to_minutes(self.TIMES_BY_DEPT['Comercial'])
+            self.conver_date_to_minutes(self.time_life_ticket)
         ]
+
+        for dept in self.LIST_DEPT:
+            if dept in self.TIMES_BY_DEPT:
+                row_info.append(self.conver_date_to_minutes(self.TIMES_BY_DEPT[dept]))
+            else:
+                row_info.append(0)
+        
+        for staff in self.__all_staff:
+            if staff in self.TIMES_BY_STAFF:
+                row_info.append(self.conver_date_to_minutes(self.TIMES_BY_STAFF[staff]))
+            else:
+                row_info.append(0)
+
+        # for key, value in self.TIMES_BY_STAFF.items():
+        #     row_info.append(key) 
+        #     row_info.append(self.conver_date_to_minutes(value)) 
+            
+        
+        return row_info
 
 
 

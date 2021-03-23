@@ -33,8 +33,7 @@ class ReportSara:
         'Tiempo de vida',
         'Operaciones',
         'Pre-Venta',
-        'Comercial',
-        'Usuarios']
+        'Comercial']
 
     @staticmethod
     def get_query_from_file(query_name):
@@ -93,6 +92,19 @@ class ReportSara:
         except Exception as e:
             logging.error(f"Error to execute query info thread ticket: {ticket['number']}")
             logging.error("Error: %s", e)
+
+    @staticmethod
+    def execute_query_all_staff():        
+        """Method that execute query get all staff
+        """
+        
+        try:
+            query = ReportSara.get_query_from_file('all_staff')    
+            database = Database()
+            return [row[0] for row in database.select_query(query)]
+        except Exception as e:
+            logging.error(f"Error to execute query all staff")
+            logging.error("Error: %s", e)
     
     @staticmethod
     def execute_report_times():
@@ -102,6 +114,7 @@ class ReportSara:
             y una estadisticas de tiempos.
         """
         tickets = ReportSara.execute_query_tickets_closed()
+        all_staff = ReportSara.execute_query_all_staff()
 
         path_file_excel = Path(PATH_FILES, 'reporte_sara_tiempos.xlsx')
         excel_file = ExcelFile(path_file_excel)
@@ -109,11 +122,12 @@ class ReportSara:
         excel_file.set_sheet("Reporte Tiempos") 
 
         # columns names
+        ReportSara.HEADERS_FILE = ReportSara.HEADERS_FILE + all_staff
         excel_file.write_row(ReportSara.HEADERS_FILE)
         
         for ticket in tickets:
             try:
-                ticket_class = Ticket(ticket)     
+                ticket_class = Ticket(ticket, all_staff)     
 
                 # Obtener la informacion del hilo de historia del ticket
                 ticket_class.set_thread_ticket(ReportSara.execute_query_info_thread(ticket_class.get_ticket()))
@@ -128,9 +142,6 @@ class ReportSara:
                 ticket_class.set_info_ticket(ReportSara.execute_query_info_ticket(ticket_class.get_ticket()))
 
                 ticket_class.get_info_detail_ticket()
-
-                # logging.info(ticket_class.get_ticket())  
-
                 
                 excel_file.write_row(ticket_class.get_info_ticket())            
             except Exception as error:

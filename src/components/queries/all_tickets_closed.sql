@@ -14,3 +14,4 @@ WHERE status_id = 3 and YEAR(NOW()) = YEAR(ost_ticket.created) and MONTH(NOW()) 
 -- WHERE status_id = 3 and YEAR(NOW()) = YEAR(ost_ticket.created)
 -- WHERE status_id = 3
 ORDER BY number DESC
+LIMIT 5

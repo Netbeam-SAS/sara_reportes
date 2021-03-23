@@ -21,6 +21,21 @@ PATH_FILES = 'files/'
 class ReportSara:
     """ Class Payload Functions"""
 
+    HEADERS_FILE = [
+        'Ticket',
+        'Departamento',
+        'Tipo de Factibilidad',
+        'Cantidad de puntos',
+        'Fecha Creado',
+        'Fecha Overdue',
+        'Fecha Cierre',
+        'SLA',
+        'Tiempo de vida',
+        'Operaciones',
+        'Pre-Venta',
+        'Comercial',
+        'Usuarios']
+
     @staticmethod
     def get_query_from_file(query_name):
         """
@@ -51,14 +66,27 @@ class ReportSara:
 
     @staticmethod
     def execute_query_info_thread(ticket):        
-        """Method tha execute query select all tickets closed
+        """Method that execute query get info thread ticket
         """
         
         try:
             query = ReportSara.get_query_from_file('info_thread_by_ticket')\
-                .format(ticket['thread_id'])        
-            # query = ReportSara.get_query_from_file('info_thread_by_ticket')\
-            #     .format(3622)        
+                .format(ticket['thread_id'])     
+            database = Database()
+            rows = database.select_query(query)
+            return rows            
+        except Exception as e:
+            logging.error(f"Error to execute query info thread ticket: {ticket['number']}")
+            logging.error("Error: %s", e)
+
+    @staticmethod
+    def execute_query_info_ticket(ticket):        
+        """Method that execute query get info ticket
+        """
+        
+        try:
+            query = ReportSara.get_query_from_file('info_by_ticket')\
+                .format(ticket['ticket_id'])     
             database = Database()
             rows = database.select_query(query)
             return rows            
@@ -81,17 +109,7 @@ class ReportSara:
         excel_file.set_sheet("Reporte Tiempos") 
 
         # columns names
-        excel_file.write_row([
-            'Ticket',
-            'Departamento',
-            'Fecha Creado',
-            'Fecha Overdue',
-            'Fecha Cierre',
-            'SLA',
-            'Tiempo de vida',
-            'Operaciones',
-            'Pre-Venta',
-            'Comercial'])
+        excel_file.write_row(ReportSara.HEADERS_FILE)
         
         for ticket in tickets:
             try:
@@ -101,7 +119,18 @@ class ReportSara:
                 ticket_class.set_thread_ticket(ReportSara.execute_query_info_thread(ticket_class.get_ticket()))
 
                 # Obtener los tiempos por cada departamento
-                ticket_class.execute_process_times()
+                ticket_class.execute_times_by_dept()
+
+                # Obtener los tiempos por cada Staff
+                ticket_class.execute_times_by_staff()
+
+                # Obtener la informacion del ticket
+                ticket_class.set_info_ticket(ReportSara.execute_query_info_ticket(ticket_class.get_ticket()))
+
+                ticket_class.get_info_detail_ticket()
+
+                # logging.info(ticket_class.get_ticket())  
+
                 
                 excel_file.write_row(ticket_class.get_info_ticket())            
             except Exception as error:

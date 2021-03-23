@@ -3,6 +3,7 @@
 # Copyright 2021 Netbeam SAS
 # Created by: Camilo Jimenez
 """ Ticket class """
+import json
 
 from itertools import groupby
 from operator import itemgetter
@@ -24,12 +25,11 @@ class Ticket:
     
     def reset(self):
         self.time_life_ticket = ''
+        self.__ticket = {}
         self.__thread_ticket = []
-        self.TIMES_BY_DEPT = {
-            'Operaciones': '',
-            'Pre-Venta': '',
-            'Comercial': ''
-        }
+        self.__info_ticket = []
+        self.TIMES_BY_DEPT = {}
+        self.TIMES_BY_STAFF = {}
     
     TICKET_HEADERS = ('ticket_id', 'number', 'dept', 'created', 'est_duedate', 'closed' , 'thread_id')
 
@@ -40,6 +40,8 @@ class Ticket:
         'event',
         'dept',
         'pdept')
+
+    INFO_TICKET_HEADERS = ('field_id', 'value')
 
     def get_ticket(self):
         return self.__ticket
@@ -59,19 +61,45 @@ class Ticket:
             logging.error(f"Error en hilo de historia del ticket: {self.__ticket['number']}")
             logging.error(f'Error: {error}')
 
+    def set_info_ticket(self, info_ticket):
+        try:
+            self.__info_ticket = [self.convert_tuple_dict(value, self.INFO_TICKET_HEADERS)\
+                for value in info_ticket]         
+        except Exception as error:
+            logging.error(f"Error en hilo de historia del ticket: {self.__ticket['number']}")
+            logging.error(f'Error: {error}')
+
     def get_thread_ticket(self):
         return self.__thread_ticket
     
-    def execute_process_times(self):
-        for key, value in groupby(self.__thread_ticket, key=itemgetter('pdept')):            
-            thread_by_dept = list(value)
-            self.TIMES_BY_DEPT[key] = thread_by_dept[-1]['timestamp'] - \
-                thread_by_dept[0]['timestamp']
+    def __get_diference_times_by_group(self, column):
+        times_by_group = {}
+        for key, value in groupby(self.__thread_ticket, key=itemgetter(column)):            
+            thread_by_group = list(value)
+            times_by_group[key] = thread_by_group[-1]['timestamp'] - \
+                thread_by_group[0]['timestamp']
+        return times_by_group
+    
+    def execute_times_by_dept(self):
+        self.TIMES_BY_DEPT = self.__get_diference_times_by_group('pdept')
+
+    def execute_times_by_staff(self):
+        self.TIMES_BY_STAFF = self.__get_diference_times_by_group('username')
+    
+    def get_info_detail_ticket(self):
+        for info in self.__info_ticket:
+            if info['field_id'] == 62:
+                dict_value = json.loads(info['value'])
+                key_dic_value = list(dict_value.keys())[0]
+                self.__ticket['fact_type'] = dict_value[key_dic_value]
+            elif info['field_id'] == 64:
+                self.__ticket['points_quantity'] = int(info['value'])
+
     
     @staticmethod
-    def conver_date_to_minutes(value):
+    def conver_date_to_minutes(date):
         try:
-            return value.total_seconds() / 60.0
+            return date.total_seconds() / 60.0
         except Exception as error:
             pass
         return 0
@@ -88,6 +116,8 @@ class Ticket:
         return [
             self.__ticket['number'],
             self.__ticket['dept'],
+            self.__ticket['fact_type'],
+            self.__ticket['points_quantity'],
             self.__ticket['created'],
             self.__ticket['est_duedate'],
             self.__ticket['closed'],

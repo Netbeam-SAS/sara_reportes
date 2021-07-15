@@ -106,7 +106,7 @@ class Ticket:
     @staticmethod
     def conver_date_to_minutes(date):
         try:
-            return date.total_seconds() / 60.0
+            return round(date.total_seconds() / 60.0, 2)
         except Exception as error:
             pass
         return 0
@@ -134,19 +134,23 @@ class Ticket:
 
         for dept in self.LIST_DEPT:
             if dept in self.TIMES_BY_DEPT:
-                row_info.append(self.conver_date_to_minutes(self.TIMES_BY_DEPT[dept]))
+                time_minutes = self.conver_date_to_minutes(self.TIMES_BY_DEPT[dept])
+                if time_minutes > 0:
+                    row_info.append(time_minutes)
+                else:
+                    row_info.append(None)
             else:
-                row_info.append(0)
+                row_info.append(None)
         
         for staff in self.__all_staff:
             if staff in self.TIMES_BY_STAFF:
-                row_info.append(self.conver_date_to_minutes(self.TIMES_BY_STAFF[staff]))
+                time_minutes = self.conver_date_to_minutes(self.TIMES_BY_STAFF[staff])
+                if time_minutes > 0:
+                    row_info.append(time_minutes)
+                else:
+                    row_info.append(None)
             else:
-                row_info.append(0)
-
-        # for key, value in self.TIMES_BY_STAFF.items():
-        #     row_info.append(key) 
-        #     row_info.append(self.conver_date_to_minutes(value)) 
+                row_info.append(None)
             
         
         return row_info

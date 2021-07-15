@@ -27,7 +27,7 @@ class ReportSara:
         'Tipo de Factibilidad',
         'Cantidad de puntos',
         'Fecha Creado',
-        'Fecha Overdue',
+        'Fecha Vencimiento',
         'Fecha Cierre',
         'SLA',
         'Tiempo de vida',
@@ -149,7 +149,7 @@ class ReportSara:
                 logging.error(f'Error: {error}')
                 
 
-        excel_file.save_excel()
+        excel_file.save_excel(len(tickets))
 
 
 

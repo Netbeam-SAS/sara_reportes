@@ -1,4 +1,4 @@
 env/
-files/*
 __pycache__/
 settings.yaml
+.vscode/

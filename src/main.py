@@ -16,7 +16,7 @@ def main():
 
     if arg.typereport == "tiempos":
         logging.info('Inicio reporte de tiempos')
-        ReportSara.execute_report_times()
+        ReportSara.execute_report_times(settings)
         logging.info('Fin reporte de tiempos')
         
     else:

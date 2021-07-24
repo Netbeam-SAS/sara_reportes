@@ -3,6 +3,7 @@
 # Copyright 2021 Netbeam SAS
 # Created by: Camilo Jimenez
 """ Commons Utils class """
+from email import message
 import os
 from pathlib import Path
 
@@ -10,6 +11,7 @@ from components.utils import CommonsUtils
 from components.database import Database
 from components.ticket import Ticket
 from components.excel_file import ExcelFile
+from components.email import Email
 
 # Init config Log
 logging = CommonsUtils.setup_logging()
@@ -34,6 +36,20 @@ class ReportSara:
         'Operaciones',
         'Pre-Venta',
         'Comercial']
+
+    @staticmethod
+    def get_html_content_from_file(query_name):
+        """
+        Method that retrieves the string from html file
+
+        :param query_name: The query filename to read
+        :return: The query string from file, throws FileNotFoundException if the file does not exist
+        """
+        base_path = os.path.dirname(os.path.realpath(__file__))
+        query_string = ''
+        with open(f'{base_path}/html_files/{query_name}.html', 'r', encoding='utf8') as f:
+            query_string = f.read()
+        return query_string.strip()
 
     @staticmethod
     def get_query_from_file(query_name):
@@ -107,7 +123,7 @@ class ReportSara:
             logging.error("Error: %s", e)
     
     @staticmethod
-    def execute_report_times():
+    def execute_report_times(settings):
         """ Function execute report Times
 
             Esta funcion se encarga de guardar en un archivo de excel la informacion de los tickets
@@ -151,6 +167,12 @@ class ReportSara:
 
         excel_file.save_excel(len(tickets))
 
+        # Enviar correo electronico
+        subject = "[SARA] Reporte de tiempos de tickets cerrados hasta hoy"
+        body = ReportSara.get_html_content_from_file('body_content_sara_tiempos')
+
+        email = Email(subject, body, [excel_file.src], settings['EMAIL'])
+        email.send_email()
 
 
         

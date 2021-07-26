@@ -20,7 +20,7 @@ class CommonsUtils:
         settings_logging = CommonsUtils.load_settings()['LOGGING']       
         
         # Setup level logging
-        logging.basicConfig(level=settings_logging['LEVEL'], format='%(levelname)s | %(message)s')
+        logging.basicConfig(level=settings_logging['LEVEL'], format='%(levelname)s | %(message)s', )
 
         return logging
 

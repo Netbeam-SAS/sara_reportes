@@ -4,20 +4,20 @@ SETTINGS:
   - API:
     - URL: 
     - PARAMS_DEFAULT:
-      - usecaption: 1
-      - username: reportsBackend
-      - passhash: 1246000603
+      - usecaption: 
+      - username: 
+      - passhash: 
   - DATABASE:
-    - USER: root
-    - PASSWORD: "N3tb34m01.#"
-    - DB_NAME: osticket
-    - HOST: 10.158.1.90
+    - USER: 
+    - PASSWORD: 
+    - DB_NAME: 
+    - HOST: 
   - EMAIL:
-    - FROM: sara@netbeam.com.co
+    - FROM: 
     - TO:
-      - camilo.jimenez@netbeam.com.co
-    - SERVER: smtp-mail.outlook.com
-    - PORT: 587
-    - USERNAME: sara@netbeam.com.co
-    - PASSWORD: N3tb34m01
+      - 
+    - SERVER: 
+    - PORT: 
+    - USERNAME: 
+    - PASSWORD: 
 

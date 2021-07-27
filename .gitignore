@@ -2,3 +2,7 @@ env/
 __pycache__/
 settings.yaml
 .vscode/
+*.log
+.cache/
+.local/
+
